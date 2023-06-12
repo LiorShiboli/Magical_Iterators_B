@@ -111,7 +111,7 @@ namespace ariel
         {
             
             primehead->primePrev = curr;
-            curr->primeNext = head;
+            curr->primeNext = primehead;
             primehead = curr;
             primes.insert(curr);
             return;
@@ -335,7 +335,7 @@ namespace ariel
             return false;
         }
 
-        bool isEndThis =(this->min==nullptr)||(this->min->data>this->max->data);
+        bool isEndThis = (this->min==nullptr)||(this->min->data>this->max->data);
         bool isEndObj2 = (obj2.min==nullptr)||(obj2.min->data>obj2.max->data);
         if (isEndObj2||isEndThis)
         {
