@@ -209,11 +209,18 @@ namespace ariel
         return end;
     }
     MagicalContainer::AscendingIterator& MagicalContainer::AscendingIterator::operator=(const MagicalContainer::AscendingIterator& something){
-        this->container =something.container;
+        if (this->container!=something.container)
+        {
+            throw std::runtime_error("different containers");
+        }
         this->curr=something.curr;
         return *this;
      }
     MagicalContainer::AscendingIterator& MagicalContainer::AscendingIterator::operator++(){
+        if (this->curr==nullptr)
+        {
+            throw std::runtime_error("cannot increment");
+        }
         this->curr =this->curr->next;
         return *this;
     }
@@ -240,9 +247,30 @@ namespace ariel
         return this->curr->data;
         }
     bool MagicalContainer::AscendingIterator::operator<(const AscendingIterator& rhs)const{
+         if (curr==nullptr)
+        {
+            return false;
+        }
+        if (rhs.curr==nullptr)
+        {
+           
+            return true;
+        }
         return this->curr->data<rhs.curr->data;
     }
      bool MagicalContainer::AscendingIterator::operator>(const AscendingIterator& rhs)const{
+         if (rhs.curr==nullptr)
+        {
+            return false;
+        }
+        if (curr==nullptr)
+        {
+            if (rhs.curr==nullptr)
+            {
+                return false;
+            }
+            return true;
+        }
         return this->curr->data > rhs.curr->data;
     }
 
@@ -265,19 +293,27 @@ namespace ariel
     }
     MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::end(){
         SideCrossIterator tmp = *this;
-        tmp.min =container->tail;
+        tmp.min =nullptr;
         tmp.max =container->head;
-        tmp.fromMin =true;
+        tmp.fromMin =false;
         return tmp;
     }
     MagicalContainer::SideCrossIterator& MagicalContainer::SideCrossIterator::operator=(const MagicalContainer::SideCrossIterator& something){
-        container = something.container;
+        if (this->container!=something.container)
+        {
+            throw std::runtime_error("different containers");
+        }
         max = something.max;
         min = something.min;
         fromMin = something.fromMin;
         return *this;
     }
     MagicalContainer::SideCrossIterator& MagicalContainer::SideCrossIterator::operator++(){
+        if (min==nullptr||(min->data>max->data))
+        {
+            throw std::runtime_error("cannot increment beyond this point");
+        }
+        
         if (fromMin)
         {
             min = min->next;
@@ -299,25 +335,11 @@ namespace ariel
             return false;
         }
 
-
-        if (this->container!=obj2.container)
+        bool isEndThis =(this->min==nullptr)||(this->min->data>this->max->data);
+        bool isEndObj2 = (obj2.min==nullptr)||(obj2.min->data>obj2.max->data);
+        if (isEndObj2||isEndThis)
         {
-            return false;
-        }
-        if (this->min==nullptr||obj2.min==nullptr)
-        {
-            if (this->min==nullptr&&obj2.min==nullptr)
-            {
-                return true;
-            }
-            return false;
-            
-        }
-        
-        
-        if (this->min->data>=this->max->data||obj2.min->data>=obj2.max->data)
-        {
-            if (this->min->data>=this->max->data&&obj2.min->data>=obj2.max->data)
+            if (isEndObj2&&isEndThis)
             {
                 return true;
             }
@@ -333,9 +355,27 @@ namespace ariel
     }
     int    MagicalContainer::SideCrossIterator::operator*()const{return (max->data)*(1- fromMin)+fromMin*min->data;}
     bool MagicalContainer::SideCrossIterator::operator<(const SideCrossIterator& rhs)const{
+        if (this->min->data<rhs.min->data)
+        {
+            return true;
+        }
+        else if (this->max->data>rhs.max->data)
+        {
+            return true;
+        }
         return false;
+        
+        
     }
      bool MagicalContainer::SideCrossIterator::operator>(const SideCrossIterator& rhs)const{
+        if (this->min->data>rhs.min->data)
+        {
+            return true;
+        }
+        else if (this->max->data>rhs.max->data)
+        {
+            return true;
+        }
         return false;
     }
 
@@ -360,11 +400,21 @@ namespace ariel
         return end;
     }
     MagicalContainer::PrimeIterator& MagicalContainer::PrimeIterator::operator=(const MagicalContainer::PrimeIterator& something){
-        this->container =something.container;
+        if (this->container!=something.container)
+        {
+            throw std::runtime_error("different containers");
+        }
+        
         this->curr=something.curr;
         return *this;}
     MagicalContainer::PrimeIterator& MagicalContainer::PrimeIterator::operator++(){
+        if (this->curr==nullptr)
+        {
+            throw std::runtime_error("cannot increment");
+        }
+        
          this->curr =this->curr->primeNext;
+         
         return *this;
     }
     bool   MagicalContainer::PrimeIterator::operator==(const MagicalContainer::PrimeIterator& obj2)const{
@@ -372,18 +422,16 @@ namespace ariel
         {
             return false;
         }
-        if (this->curr==nullptr||obj2.curr==nullptr)
+        
+        if ((this->curr==nullptr)||(obj2.curr==nullptr))
         {
-             std::cout<< "1"<<std::endl;
             if (this->curr==nullptr&&obj2.curr==nullptr)
             {
-                 std::cout<< "2"<<std::endl;
                 return true;
             }
             return false;
             
         }
-        
         return this->curr->data==obj2.curr->data;
         
     }
@@ -391,24 +439,25 @@ namespace ariel
         return this->curr->data;
     }
     bool MagicalContainer::PrimeIterator::operator<(const PrimeIterator& rhs)const{
+        if (curr==nullptr)
+        {
+            return false;
+        }
         if (rhs.curr==nullptr)
         {
-            if (curr==nullptr)
-            {
-                return false;
-            }
             return true;
         }
         
         return this->curr->data<rhs.curr->data;
     }
      bool MagicalContainer::PrimeIterator::operator>(const PrimeIterator& rhs)const{
-         if (curr==nullptr)
+        if (rhs.curr==nullptr)
         {
-            if (rhs.curr==nullptr)
-            {
-                return false;
-            }
+            return false;
+        } 
+        if (curr==nullptr)
+        {
+            
             return true;
         }
         return this->curr->data > rhs.curr->data;

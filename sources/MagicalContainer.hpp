@@ -14,6 +14,8 @@ namespace ariel
             data=element;
             next=nullptr;
             prev =nullptr;
+            primeNext= nullptr;
+            primePrev =nullptr;
         }
         
     };
